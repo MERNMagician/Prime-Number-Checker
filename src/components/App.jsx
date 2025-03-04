@@ -6,28 +6,42 @@ import { useState, useEffect, useRef } from "react";
 
 const App = () => {
   const [number, setNumber] = useState(0);
+  const [numberToCheck, setNumberToCheck] = useState(0);
   const [prime, checkPrime] = useState(false);
-  let [primeNumber, setIsPrimeNumber] = useState(false);
+  const [result, setResult] = useState(false);
+  const [primeNumber, setIsPrimeNumber] = useState(false);
+  const [isFirstLoad, setFirstLoad] = useState(true);
   const ref = useRef();
 
   const handleChange = (event) => {
     setNumber(event.target.value);
   };
+  const clearInput = () => {
+    ref.current.value = "";
+    setFirstLoad(true);
+  };
 
-  useEffect(() => {
-    console.log(ref.current);
-  }, [ref]);
-
-  const clearInput = () => {};
   const isPrime = (number) => {
     if (number) {
-      console.log(`Number : ${number}`);
+      setFirstLoad(false);
+      return number % 2 != 0;
     }
   };
 
   useMemo(() => {
     setIsPrimeNumber(isPrime(number));
+    setNumberToCheck(number);
   }, [prime]);
+
+  useEffect(() => {
+    setNumber(number);
+  }, [number]);
+
+  useEffect(() => {
+    if (primeNumber) {
+      setResult(true);
+    }
+  }, [primeNumber]);
 
   return (
     <div className="flex flex-col gap-5 mt-15">
@@ -36,9 +50,10 @@ const App = () => {
         onChange={handleChange}
         onClear={clearInput}
         onSubmit={() => checkPrime(!prime)}
+        customValue={numberToCheck}
         ref={ref}
       />
-      <Output />
+      <Output isPrime={primeNumber} isFirstLoad={isFirstLoad} />
     </div>
   );
 };
